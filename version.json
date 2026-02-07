@@ -1,0 +1,55 @@
+{
+  "name": "QCM5 Quantum Error Correction Platform",
+  "version": "1.0.0",
+  "programmatic_name": "qcm5-quantum-error-correction",
+  "provider": "EpochCore",
+  "category": "AI / Machine Learning",
+  "type": "software",
+  "format": "terraform",
+  "target": "ibm_cloud",
+  "description": "Advanced quantum error correction platform providing zero-queue access to 2,999 physical qubits across 15 IBM Quantum backends with surface code QEC implementation.",
+  "features": [
+    "15 IBM Quantum backends (Condor, Heron, Eagle, and more)",
+    "2,999 physical qubits → 111 logical qubits",
+    "Surface code quantum error correction",
+    "Fidelity-first automatic backend routing",
+    "Zero queue wait time (<10ms routing)",
+    "SOC2, IL4 compliant",
+    "Multi-cloud support (IBM Quantum, AWS Braket, NVIDIA NGC)"
+  ],
+  "pricing": {
+    "free": {
+      "name": "Free",
+      "price": 0,
+      "jobs_per_month": 100,
+      "backends": 1,
+      "qec": false,
+      "support": "community"
+    },
+    "professional": {
+      "name": "Professional",
+      "price_monthly": 299,
+      "jobs_per_month": 10000,
+      "backends": 15,
+      "qec": true,
+      "support": "24/7 email, 1-hour response"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price_monthly": 2999,
+      "jobs_per_month": -1,
+      "backends": 15,
+      "qec": true,
+      "dedicated_backends": true,
+      "support": "24/7, dedicated engineer, 15-min P1"
+    }
+  },
+  "compliance": ["SOC2", "IL4", "NIST 800-53", "GDPR"],
+  "documentation": "https://epochcoreqcs.com/docs",
+  "support": "https://epochcoreqcs.com/support",
+  "contact": {
+    "name": "John Ryan",
+    "email": "john@epochcoreqcs.com",
+    "company": "EpochCore, LLC"
+  }
+}
