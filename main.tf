@@ -29,7 +29,7 @@ data "ibm_resource_group" "default" {
 }
 
 locals {
-  resource_group_id = local.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.default[0].id
+  resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.default[0].id
 }
 
 # ═══════════════════════════════════════════════════════════════════════
