@@ -30,6 +30,7 @@ data "ibm_resource_group" "default" {
 
 locals {
   resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.default[0].id
+  service_plan      = var.plan == "free" ? "lite" : "standard"
 }
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -144,7 +145,7 @@ resource "ibm_code_engine_secret" "quantum_secrets" {
 resource "ibm_resource_instance" "event_streams" {
   name              = "${var.instance_name}-events"
   service           = "messagehub"
-  plan              = "lite"
+  plan              = local.service_plan
   location          = var.region
   resource_group_id = local.resource_group_id
 
@@ -164,7 +165,7 @@ resource "ibm_resource_key" "event_streams_key" {
 resource "ibm_cloudant" "qcm5_db" {
   name              = "${var.instance_name}-db"
   location          = var.region
-  plan              = "lite"
+  plan              = local.service_plan
   resource_group_id = local.resource_group_id
 
   legacy_credentials = false
