@@ -20,12 +20,25 @@ provider "ibm" {
 }
 
 # ═══════════════════════════════════════════════════════════════════════
+# RESOURCE GROUP - Use provided or lookup Default
+# ═══════════════════════════════════════════════════════════════════════
+
+data "ibm_resource_group" "default" {
+  count    = var.resource_group_id == "" ? 1 : 0
+  is_default = true
+}
+
+locals {
+  resource_group_id = local.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.default[0].id
+}
+
+# ═══════════════════════════════════════════════════════════════════════
 # CODE ENGINE PROJECT - Serverless QCM5 Platform
 # ═══════════════════════════════════════════════════════════════════════
 
 resource "ibm_code_engine_project" "qcm5_project" {
   name              = "${var.instance_name}-project"
-  resource_group_id = var.resource_group_id
+  resource_group_id = local.resource_group_id
 }
 
 # QCM5 API Application - Placeholder (swap image when custom built)
@@ -133,7 +146,7 @@ resource "ibm_resource_instance" "event_streams" {
   service           = "messagehub"
   plan              = "lite"
   location          = var.region
-  resource_group_id = var.resource_group_id
+  resource_group_id = local.resource_group_id
 
   tags = var.tags
 }
@@ -152,7 +165,7 @@ resource "ibm_cloudant" "qcm5_db" {
   name              = "${var.instance_name}-db"
   location          = var.region
   plan              = "lite"
-  resource_group_id = var.resource_group_id
+  resource_group_id = local.resource_group_id
 
   legacy_credentials = false
   include_data_events = true

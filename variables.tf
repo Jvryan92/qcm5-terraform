@@ -21,8 +21,9 @@ variable "region" {
 }
 
 variable "resource_group_id" {
-  description = "IBM Cloud Resource Group ID"
+  description = "IBM Cloud Resource Group ID (leave empty to use Default resource group)"
   type        = string
+  default     = ""
 }
 
 variable "enable_qec" {
