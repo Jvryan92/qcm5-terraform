@@ -5,6 +5,10 @@ terraform {
       source  = "IBM-Cloud/ibm"
       version = ">= 1.60.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
 }
 
@@ -28,9 +32,16 @@ data "ibm_resource_group" "default" {
   is_default = true
 }
 
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 locals {
   resource_group_id = var.resource_group_id != "" ? var.resource_group_id : data.ibm_resource_group.default[0].id
   service_plan      = var.plan == "free" ? "lite" : "standard"
+  name_prefix       = "${var.instance_name}-${random_string.suffix.result}"
 }
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -38,14 +49,14 @@ locals {
 # ═══════════════════════════════════════════════════════════════════════
 
 resource "ibm_code_engine_project" "qcm5_project" {
-  name              = "${var.instance_name}-project"
+  name              = "${local.name_prefix}-project"
   resource_group_id = local.resource_group_id
 }
 
 # QCM5 API Application - Placeholder (swap image when custom built)
 resource "ibm_code_engine_app" "qcm5_api" {
   project_id      = ibm_code_engine_project.qcm5_project.project_id
-  name            = "${var.instance_name}-api"
+  name            = "${local.name_prefix}-api"
   image_reference = "icr.io/codeengine/helloworld:latest"
 
   scale_min_instances = 0
@@ -75,7 +86,7 @@ resource "ibm_code_engine_app" "qcm5_api" {
 # Flash Sync Cron Job - 26-node A-Z matrix synchronization
 resource "ibm_code_engine_job" "flash_sync" {
   project_id      = ibm_code_engine_project.qcm5_project.project_id
-  name            = "${var.instance_name}-flash-sync"
+  name            = "${local.name_prefix}-flash-sync"
   image_reference = "icr.io/codeengine/helloworld:latest"  # Placeholder until custom image built
 
   scale_cpu_limit    = "1"
@@ -104,7 +115,7 @@ resource "ibm_code_engine_job" "flash_sync" {
 # QEC Decoder Job - Surface code error correction
 resource "ibm_code_engine_job" "qec_decoder" {
   project_id      = ibm_code_engine_project.qcm5_project.project_id
-  name            = "${var.instance_name}-qec-decoder"
+  name            = "${local.name_prefix}-qec-decoder"
   image_reference = "icr.io/codeengine/helloworld:latest"  # Placeholder until custom image built
 
   scale_cpu_limit    = "4"
@@ -130,7 +141,7 @@ resource "ibm_code_engine_job" "qec_decoder" {
 
 resource "ibm_code_engine_secret" "quantum_secrets" {
   project_id = ibm_code_engine_project.qcm5_project.project_id
-  name       = "${var.instance_name}-secrets"
+  name       = "${local.name_prefix}-secrets"
   format     = "generic"
 
   data = {
@@ -143,7 +154,7 @@ resource "ibm_code_engine_secret" "quantum_secrets" {
 # ═══════════════════════════════════════════════════════════════════════
 
 resource "ibm_resource_instance" "event_streams" {
-  name              = "${var.instance_name}-events"
+  name              = "${local.name_prefix}-events"
   service           = "messagehub"
   plan              = local.service_plan
   location          = var.region
@@ -153,7 +164,7 @@ resource "ibm_resource_instance" "event_streams" {
 }
 
 resource "ibm_resource_key" "event_streams_key" {
-  name                 = "${var.instance_name}-events-key"
+  name                 = "${local.name_prefix}-events-key"
   resource_instance_id = ibm_resource_instance.event_streams.id
   role                 = "Manager"
 }
@@ -163,7 +174,7 @@ resource "ibm_resource_key" "event_streams_key" {
 # ═══════════════════════════════════════════════════════════════════════
 
 resource "ibm_cloudant" "qcm5_db" {
-  name              = "${var.instance_name}-db"
+  name              = "${local.name_prefix}-db"
   location          = var.region
   plan              = local.service_plan
   resource_group_id = local.resource_group_id
