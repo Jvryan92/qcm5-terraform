@@ -1,22 +1,54 @@
 {
   "name": "QCM5 Quantum Error Correction Platform",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "programmatic_name": "qcm5-quantum-error-correction",
   "provider": "EpochCore",
   "category": "AI / Machine Learning",
   "type": "software",
   "format": "terraform",
   "target": "ibm_cloud",
-  "description": "Advanced quantum error correction platform providing zero-queue access to 2,999 physical qubits across 15 IBM Quantum backends with surface code QEC implementation.",
+  "description": "Advanced quantum error correction platform providing zero-queue access to 2,999 physical qubits across 15 IBM Quantum backends with surface code QEC, 8-node Model Council gossip consensus, and compliance profiles for pharma (FDA/GxP) and federal (FedRAMP/ITAR) contracts.",
   "features": [
     "15 IBM Quantum backends (Condor, Heron, Eagle, and more)",
     "2,999 physical qubits → 111 logical qubits",
     "Surface code quantum error correction",
     "Fidelity-first automatic backend routing",
     "Zero queue wait time (<10ms routing)",
-    "SOC2, IL4 compliant",
+    "8-Node Model Council Gossip Consensus Protocol",
+    "Pharma Compliance Profile (FDA 21 CFR Part 11, GxP, HIPAA, ICH E6 R2)",
+    "Federal Compliance Profile (FedRAMP, NIST 800-53, ITAR, CMMC L2, FISMA)",
+    "Compliance gate nodes with IBM Granite elevated orchestrator",
+    "Immutable audit trails per consensus session",
+    "SOC2, IL4, FedRAMP-ready architecture",
     "Multi-cloud support (IBM Quantum, AWS Braket, NVIDIA NGC)"
   ],
+  "model_council": {
+    "protocol": "octa-node-gossip-consensus",
+    "nodes": ["Claude Opus 4.6", "IBM Granite 3.1", "Llama 3.3 70B", "GPT-4o", "Gemini 2.0 Flash", "Mistral Large", "DeepSeek R1", "Qwen 2.5 72B"],
+    "topology": "octa-ring-crosslink",
+    "profiles": {
+      "default": {
+        "threshold": 0.75,
+        "max_rounds": 6,
+        "gate_nodes": []
+      },
+      "pharma": {
+        "threshold": 0.80,
+        "max_rounds": 8,
+        "frameworks": ["FDA 21 CFR Part 11", "GxP", "HIPAA", "ICH E6(R2) GCP"],
+        "gate_nodes": ["granite", "mistral"],
+        "granite_weight": 1.8
+      },
+      "federal": {
+        "threshold": 0.85,
+        "max_rounds": 8,
+        "frameworks": ["FedRAMP", "NIST 800-53", "ITAR", "CMMC Level 2", "FISMA"],
+        "gate_nodes": ["granite", "gpt4o", "mistral"],
+        "granite_weight": 2.0,
+        "itar_restricted": ["deepseek", "qwen"]
+      }
+    }
+  },
   "pricing": {
     "free": {
       "name": "Free",
@@ -24,6 +56,7 @@
       "jobs_per_month": 100,
       "backends": 1,
       "qec": false,
+      "council_profiles": ["default"],
       "support": "community"
     },
     "professional": {
@@ -32,6 +65,8 @@
       "jobs_per_month": 10000,
       "backends": 15,
       "qec": true,
+      "council_profiles": ["default", "pharma"],
+      "compliance_audit": "cloudant",
       "support": "24/7 email, 1-hour response"
     },
     "enterprise": {
@@ -41,10 +76,12 @@
       "backends": 15,
       "qec": true,
       "dedicated_backends": true,
+      "council_profiles": ["default", "pharma", "federal"],
+      "compliance_audit": "watsonx.data Iceberg (7yr pharma / 10yr federal retention)",
       "support": "24/7, dedicated engineer, 15-min P1"
     }
   },
-  "compliance": ["SOC2", "IL4", "NIST 800-53", "GDPR"],
+  "compliance": ["SOC2", "IL4", "NIST 800-53", "GDPR", "FDA 21 CFR Part 11", "GxP", "HIPAA", "FedRAMP", "ITAR", "CMMC L2", "FISMA"],
   "documentation": "https://epochcoreqcs.com/docs",
   "support": "https://epochcoreqcs.com/support",
   "contact": {

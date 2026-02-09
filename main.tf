@@ -136,6 +136,150 @@ resource "ibm_code_engine_job" "qec_decoder" {
 }
 
 # ═══════════════════════════════════════════════════════════════════════
+# MODEL COUNCIL - Octa-Node Gossip Consensus + Compliance Profiles
+# ═══════════════════════════════════════════════════════════════════════
+# 8-node Bayesian gossip consensus (Opus, Granite, Llama, GPT-4o,
+# Gemini, Mistral, DeepSeek, Qwen) with profile-weighted thresholds
+# Profiles: default (75%), pharma (80% FDA/GxP), federal (85% ITAR)
+# Gate nodes enforce regulatory approval before consensus passes
+# ═══════════════════════════════════════════════════════════════════════
+
+resource "ibm_code_engine_app" "model_council" {
+  project_id      = ibm_code_engine_project.qcm5_project.project_id
+  name            = "${local.name_prefix}-model-council"
+  image_reference = "icr.io/codeengine/helloworld:latest"
+
+  scale_min_instances = 0
+  scale_max_instances = 5
+  scale_cpu_limit     = "2"
+  scale_memory_limit  = "4G"
+
+  # Council Protocol
+  run_env_variables {
+    type  = "literal"
+    name  = "COUNCIL_PROTOCOL"
+    value = "octa-node-gossip-consensus"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "COUNCIL_NODES"
+    value = "opus,granite,llama,gpt4o,gemini,mistral,deepseek,qwen"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "TOPOLOGY"
+    value = "octa-ring-crosslink"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "GOSSIP_NEIGHBORS_PER_NODE"
+    value = "3"
+  }
+
+  # Profile availability gated by plan tier
+  run_env_variables {
+    type  = "literal"
+    name  = "COMPLIANCE_PROFILES"
+    value = var.plan == "enterprise" ? "default,pharma,federal" : (var.plan == "professional" ? "default,pharma" : "default")
+  }
+
+  # Pharma: FDA 21 CFR Part 11, GxP, HIPAA, ICH E6(R2) GCP
+  run_env_variables {
+    type  = "literal"
+    name  = "PHARMA_FRAMEWORKS"
+    value = "FDA_21CFR11,GxP,HIPAA,ICH_E6_R2"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "PHARMA_THRESHOLD"
+    value = "0.80"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "PHARMA_GATE_NODES"
+    value = "granite,mistral"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "GRANITE_PHARMA_WEIGHT"
+    value = "1.8"
+  }
+
+  # Federal: FedRAMP, NIST 800-53, ITAR, CMMC L2, FISMA
+  run_env_variables {
+    type  = "literal"
+    name  = "FEDERAL_FRAMEWORKS"
+    value = "FedRAMP,NIST_800_53,ITAR,CMMC_L2,FISMA"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "FEDERAL_THRESHOLD"
+    value = "0.85"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "FEDERAL_GATE_NODES"
+    value = "granite,gpt4o,mistral"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "GRANITE_FEDERAL_WEIGHT"
+    value = "2.0"
+  }
+
+  # ITAR-restricted node demotion
+  run_env_variables {
+    type  = "literal"
+    name  = "ITAR_RESTRICTED_NODES"
+    value = "deepseek,qwen"
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "ITAR_RESTRICTED_WEIGHT"
+    value = "0.5"
+  }
+
+  # Live Cloudflare Worker bridge
+  run_env_variables {
+    type  = "literal"
+    name  = "COUNCIL_WORKER_URL"
+    value = var.council_worker_url
+  }
+
+  run_env_variables {
+    type  = "literal"
+    name  = "FLASH_SYNC_HZ"
+    value = "7777.77"
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════════════
+# CLOUDANT - Council Audit Trail Databases (Compliance Persistence)
+# ═══════════════════════════════════════════════════════════════════════
+
+resource "ibm_cloudant_database" "council_sessions" {
+  instance_crn  = ibm_cloudant.qcm5_db.crn
+  db            = "council_sessions"
+  partitioned   = false
+}
+
+resource "ibm_cloudant_database" "compliance_audit_trail" {
+  instance_crn  = ibm_cloudant.qcm5_db.crn
+  db            = "compliance_audit_trail"
+  partitioned   = true
+}
+
+# ═══════════════════════════════════════════════════════════════════════
 # SECRETS MANAGER - Quantum API Tokens
 # ═══════════════════════════════════════════════════════════════════════
 

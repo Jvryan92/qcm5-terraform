@@ -50,5 +50,25 @@ output "quantum_infrastructure" {
     flash_sync_hz    = 7777.77
     qec_enabled      = var.enable_qec
     consensus_agents = 52
+    model_council    = true
+    council_nodes    = 8
   }
+}
+
+output "model_council_endpoint" {
+  description = "Model Council API endpoint URL"
+  value       = ibm_code_engine_app.model_council.endpoint
+}
+
+output "council_databases" {
+  description = "Council + compliance audit Cloudant databases"
+  value = {
+    sessions    = ibm_cloudant_database.council_sessions.db
+    audit_trail = ibm_cloudant_database.compliance_audit_trail.db
+  }
+}
+
+output "compliance_profiles" {
+  description = "Available compliance council profiles by plan"
+  value = var.plan == "enterprise" ? "default, pharma, federal" : (var.plan == "professional" ? "default, pharma" : "default")
 }

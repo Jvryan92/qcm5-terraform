@@ -45,7 +45,7 @@ variable "routing_mode" {
 variable "tags" {
   description = "Tags to associate with the QCM5 instance"
   type        = list(string)
-  default     = ["quantum", "qec", "qcm5"]
+  default     = ["quantum", "qec", "qcm5", "model-council"]
 }
 
 variable "ibm_quantum_token" {
@@ -53,4 +53,10 @@ variable "ibm_quantum_token" {
   type        = string
   sensitive   = true
   default     = ""
+}
+
+variable "council_worker_url" {
+  description = "Cloudflare Worker URL for live Model Council gossip consensus engine"
+  type        = string
+  default     = "https://epochcore-unified-worker.epochcoreras.workers.dev"
 }
