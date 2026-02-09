@@ -58,5 +58,17 @@ variable "ibm_quantum_token" {
 variable "council_worker_url" {
   description = "Cloudflare Worker URL for live Model Council gossip consensus engine"
   type        = string
-  default     = "https://epochcore-unified-worker.epochcoreras.workers.dev"
+  default     = "https://council-orchestrator.epochcoreras.workers.dev"
+}
+
+variable "dispatch_endpoint" {
+  description = "Dispatch namespace controller URL for tiered routing"
+  type        = string
+  default     = "https://my-dispatcher.epochcoreras.workers.dev"
+}
+
+variable "synthesis_endpoint" {
+  description = "Full stack synthesis endpoint for cross-worker state aggregation"
+  type        = string
+  default     = "https://my-dispatcher.epochcoreras.workers.dev/swarm/synthesis"
 }

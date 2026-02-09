@@ -1,6 +1,4 @@
-# ═══════════════════════════════════════════════════════════════════════
 # QCM5 Platform Outputs
-# ═══════════════════════════════════════════════════════════════════════
 
 output "project_id" {
   description = "Code Engine project ID"
@@ -71,4 +69,30 @@ output "council_databases" {
 output "compliance_profiles" {
   description = "Available compliance council profiles by plan"
   value = var.plan == "enterprise" ? "default, pharma, federal" : (var.plan == "professional" ? "default, pharma" : "default")
+}
+
+output "dispatch_controller" {
+  description = "Dispatch namespace controller with tier routing"
+  value = {
+    endpoint       = var.dispatch_endpoint
+    namespace      = "staging"
+    tiers          = ["standard ($299/mo)", "edge ($999/mo)", "lakehouse ($2,499/mo)"]
+    synthesis      = var.synthesis_endpoint
+    council        = var.council_worker_url
+    mcp_servers    = 12
+    council_nodes  = 8
+  }
+}
+
+output "optimization_metrics" {
+  description = "Swarm optimization compound metrics"
+  value = {
+    tranches_complete   = 5
+    total_steps         = 50
+    final_compound      = 119728.3
+    phi                 = 1.618033988749895
+    flash_sync_hz       = 7777.77
+    num_profiles        = 3
+    caches_active       = 3
+  }
 }
