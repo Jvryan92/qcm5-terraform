@@ -124,19 +124,6 @@ resource "ibm_code_engine_app" "edgecapsule_bridge" {
   }
 }
 
-# EdgeCapsule API Gateway routes
-resource "ibm_code_engine_domain_mapping" "edge_api" {
-  count = var.qcm5_tier == "edge_enterprise" || var.qcm5_tier == "lakehouse_pro" ? 1 : 0
-
-  project_id = ibm_code_engine_project.qcm5_project.project_id
-  name       = "qcm5-edge-api.${var.region}.codeengine.appdomain.cloud"
-
-  component {
-    name          = ibm_code_engine_app.edgecapsule_bridge[0].name
-    resource_type = "app_v2"
-  }
-}
-
 # ─────────────────────────────────────────────────────────────────────────
 # TIER 3: LAKEHOUSE PRO - watsonx.data Integration
 # ─────────────────────────────────────────────────────────────────────────
