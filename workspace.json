@@ -1,0 +1,52 @@
+{
+  "name": "qcm5-quantum-error-correction",
+  "type": ["terraform_v1.5"],
+  "location": "us-south",
+  "description": "QCM5 Quantum Error Correction Platform - 2,999 qubits, 15 backends, surface code QEC, 8-node Model Council with pharma/federal compliance profiles",
+  "resource_group": "Default",
+  "tags": ["qcm5", "quantum", "error-correction", "epochcore", "model-council", "compliance", "pharma", "federal"],
+  "template_repo": {
+    "url": "https://github.com/epochcoreras/qcm5-terraform",
+    "branch": "main"
+  },
+  "template_data": [{
+    "folder": ".",
+    "type": "terraform_v1.5",
+    "variablestore": [
+      {
+        "name": "region",
+        "value": "us-south"
+      },
+      {
+        "name": "instance_name",
+        "value": "qcm5"
+      },
+      {
+        "name": "resource_group_id",
+        "value": "",
+        "description": "Resource group ID - set in IBM Cloud"
+      },
+      {
+        "name": "ibm_quantum_token",
+        "value": "",
+        "secure": true,
+        "description": "IBM Quantum API token"
+      },
+      {
+        "name": "plan",
+        "value": "professional",
+        "description": "QCM5 plan: free, professional, enterprise. Controls compliance profile availability."
+      },
+      {
+        "name": "qcm5_tier",
+        "value": "standard",
+        "description": "Subscription tier: standard ($299), edge_enterprise ($999), lakehouse_pro ($2,499). Lakehouse Pro adds watsonx.data compliance audit persistence."
+      },
+      {
+        "name": "watsonx_data_instance_id",
+        "value": "",
+        "description": "watsonx.data instance CRN for Lakehouse Pro compliance audit trail Iceberg tables"
+      }
+    ]
+  }]
+}
